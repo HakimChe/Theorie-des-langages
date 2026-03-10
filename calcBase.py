@@ -4,7 +4,9 @@ from genereTreeGraphviz2 import printTreeGraph
 reserved={
         'print':'PRINT',
         'if':'IF',
-        'while':'WHILE'
+        'else':'ELSE',
+        'while':'WHILE',
+        'for':'FOR'
         }
  
 tokens = [ 'NUMBER','MINUS', 'PLUS','TIMES','DIVIDE', 'LPAREN',
@@ -66,6 +68,8 @@ def evalInst(t) :
     if t[0] == 'assign' : names[t[1]] = evalExpr(t[2])
     if t[0] == 'if' :
         if evalExpr(t[1]) : evalInst(t[2])
+    ##if t[0] == 'else':
+        ##evalExpr(t[1]) : evalInst(t[2]) 
     if t[0] == 'while' :
         while evalExpr(t[1]) : evalInst(t[2])
 
@@ -101,10 +105,18 @@ def p_bloc(p):
 def p_statement_if(p):
     'statement : IF LPAREN expression RPAREN LACC bloc RACC'
     p[0] = ('if', p[3], p[6])
+    
+def p_statement_else(p):
+    'statement : ELSE LACC bloc RACC'
+    p[0] = ('else', p[1], p[3])
 
 def p_statement_while(p):
     'statement : WHILE LPAREN expression RPAREN LACC bloc RACC'
     p[0] = ('while', p[3], p[6])
+    
+def p_statement_for(p):
+    'statement : FOR LPAREN statement RPAREN SEMI expression SEMI expression LACC bloc RACC'
+    p[0] = ('for', p[3], p[6])
 
 
 def p_statement_expr(p): 
@@ -175,5 +187,5 @@ def p_error(p):    print("Syntax error in input!")
  
 import ply.yacc as yacc
 yacc.yacc()
-s = 'if(1<2){print(5+5);};print(5+5);'
+s = 'while(3<2){print(1+1);};'
 yacc.parse(s)
